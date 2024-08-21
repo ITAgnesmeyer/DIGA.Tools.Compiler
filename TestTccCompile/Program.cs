@@ -99,28 +99,34 @@ namespace TestTccCompile
 
         static void Main(string[] args)
         {
-            string code = "#include <tcclib.h>\n" + /* include the "Simple libc header for TCC" */
-                          "#define _cdecl __attribute__((__cdecl__))\n" + /*define cdelc calling convention*/
-                          "#define _import __attribute__((dllimport))\n" + /*define dllimport for symbol*/
-                          "_cdecl _import extern int add(int a, int b);\n" +
-                          "_import extern const char hello[];\n" +
-                          "_cdecl int fib(int n)\n" +
-                          "{\n" +
-                          "    if (n <= 2)\n" +
-                          "        return 1;\n" +
-                          "    else\n" +
-                          "        return fib(n-1) + fib(n-2);\n" +
-                          "}\n" +
-                          "\n" +
-                          "_cdecl int foo(int n, const char* txt)\n" +
-                          "{\n" +
-                          "    printf(\"%s\\n\", hello);\n" +
-                          "    printf(\"fib(%d) = %d\\n\", n, fib(n));\n" +
-                          "    printf(\"add(%d, %d) = %d\\n\", n, 2 * n, add(n, 2 * n));\n" +
-                          "    printf(\"param Text=%s\\n\",txt);\n" +
-                          "    return 0;\n" +
-                          "}\n";
+            //string code = "#include <tcclib.h>\n" + /* include the "Simple libc header for TCC" */
+            //              "#define _cdecl __attribute__((__cdecl__))\n" + /*define cdelc calling convention*/
+            //              "#define _import __attribute__((dllimport))\n" + /*define dllimport for symbol*/
+            //              "//_cdecl _import extern int add(int a, int b);\n" +
+            //              "//_import extern const char hello[];\n" +
+            //              "_cdecl int fib(int n)\n" +
+            //              "{\n" +
+            //              "    if (n <= 2)\n" +
+            //              "        return 1;\n" +
+            //              "    else\n" +
+            //              "        return fib(n-1) + fib(n-2);\n" +
+            //              "}\n" +
+            //              "\n" +
+            //              "_cdecl int foo(int n, const char* txt)\n" +
+            //              "{\n" +
+            //              "    printf(\"%s\\n\", hello);\n" +
+            //              "    printf(\"fib(%d) = %d\\n\", n, fib(n));\n" +
+            //              "    printf(\"add(%d, %d) = %d\\n\", n, 2 * n, add(n, 2 * n));\n" +
+            //              "    printf(\"param Text=%s\\n\",txt);\n" +
+            //              "    return 0;\n" +
+            //              "}\n";
 
+            string code = @"#include <windows.h>
+__declspec(dllexport) const char *hello_data = ""(not set)"";
+__declspec(dllexport) void hello_func (void)
+{
+    MessageBox (0, hello_data, ""From DLL"", MB_ICONINFORMATION);
+}";
 
             //Create a Compiler Object please use always USING
             //The Object must be disposed!!!
@@ -130,24 +136,24 @@ namespace TestTccCompile
                 //string fp = Path.Combine(Environment.CurrentDirectory, "Code.c");
 
                 //code = File.ReadAllText(fp);
+                compiler.CompilerErrorAction = ErrorFuncDel;
 
 
 
+                if (compiler.CompileSourceToDll(code, "test.dll") == -1)
+                {
+                    Console.WriteLine("Could not comple");
+                    return;
+                }
 
-                //if (compiler.CompileString(code) == -1)
-                //{
-                //    Console.WriteLine("Could not comple");
-                //    return;
-                //}
 
-     
                 DelegatePtr bnClick = new OnClick(OnButtonClick);
                 compiler.BeforeCompileAction = () =>
                 {
                     compiler.AddSymbol("ButtonClick", bnClick);
                 };
 
-                compiler.CompilerErrorAction = ErrorFuncDel;
+                
                 //Waits until windows closed!
                 compiler.Run( "Code.c");
 

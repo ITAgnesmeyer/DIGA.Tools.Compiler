@@ -83,7 +83,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         case WM_COMMAND:
             if(wParam == ID_BN)
-                //ButtonClickx(hwnd);
+                ButtonClick(hwnd);
             break;
         // ----------------------- let windows do all other stuff
         default:

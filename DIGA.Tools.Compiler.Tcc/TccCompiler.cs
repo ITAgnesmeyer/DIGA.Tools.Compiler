@@ -26,7 +26,8 @@ namespace Diga.Tools.Compiler.Tcc
         /// </summary>
         public TccCompiler()
         {
-            FileInfo fi = new FileInfo(Assembly.GetExecutingAssembly().Location);
+            
+            FileInfo fi = new FileInfo(AppContext.BaseDirectory);
             string dirPath = fi.DirectoryName;
 
 
